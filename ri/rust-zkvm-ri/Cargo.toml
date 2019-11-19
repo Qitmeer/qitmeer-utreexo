@@ -1,5 +1,5 @@
 [package]
-name = "rust_utreexo"
+name = "zkvm_utreexo"
 version = "0.1.0"
 authors = ["Alex Wu <dindinw@users.noreply.github.com>"]
 edition = "2018"
