@@ -4,7 +4,7 @@
 target
 **/*.rs.bk
 Cargo.lock
-go/cmd/txottl/txottl
-go/cmd/blockparser/blockparser
-go/cmd/ibdsim/ibdsim
-go/cmd/clair/clair
+ri/go-mitdci-ri/cmd/txottl/txottl
+ri/go-mitdci-ri/cmd/blockparser/blockparser
+ri/go-mitdci-ri/cmd/ibdsim/ibdsim
+ri/go-mitdci-ri/cmd/clair/clair
