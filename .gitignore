@@ -1,7 +1,10 @@
 *.txos
 *.swp
 *.swo
-cmd/txottl/txottl
-cmd/blockparser/blockparser
-cmd/ibdsim/ibdsim
-cmd/clair/clair
+target
+**/*.rs.bk
+Cargo.lock
+go/cmd/txottl/txottl
+go/cmd/blockparser/blockparser
+go/cmd/ibdsim/ibdsim
+go/cmd/clair/clair
