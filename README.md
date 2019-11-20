@@ -5,6 +5,11 @@ A dynamic hash based accumulator designed for the Qitmeer UTXO set
 The orginal ePrint paper here: [https://eprint.iacr.org/2019/611](https://eprint.iacr.org/2019/611) 
   - the [latest updated version (2019-11-17) ](./utreexo.pdf)
   - the [Chinese-translated version](https://github.com/DAGfans/TranStudy/tree/master/Papers/Utreexo) by [DAGfans](https://dagfans.org)
+ 
+## Build
+```shell script
+go build
+```
 
 ## The Reference implementations
 
