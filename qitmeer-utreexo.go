@@ -7,13 +7,13 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/forchain/utreexo/cmd/blockparser"
-	"github.com/forchain/utreexo/cmd/txottl"
-	"github.com/forchain/utreexo/cmd/ibdsim"
+	"github.com/Qitmeer/qitmeer-utreexo/cmd/blockparser"
+	"github.com/Qitmeer/qitmeer-utreexo/cmd/txottl"
+	"github.com/Qitmeer/qitmeer-utreexo/cmd/ibdsim"
 )
 
 var msg = `
-Usage: simcmd COMMAND [OPTION]
+Usage: qitmeer-utreexo COMMAND [OPTION]
 A dynamic hash based accumulator designed for the Bitcoin UTXO set
 
 Commands:
