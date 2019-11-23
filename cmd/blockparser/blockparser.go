@@ -32,10 +32,10 @@ make a txo text file with the ttl times on each line
 //CurrentHeaderHash is the 80byte header double hashed
 //Prevhash is the 32 byte previous header included in the 80byte header.
 type RawHeaderData struct {
-	FileNum [4]byte
-	Offset [4]byte
+	FileNum           [4]byte
+	Offset            [4]byte
 	CurrentHeaderHash [32]byte
-	Prevhash [32]byte
+	Prevhash          [32]byte
 }
 
 //chainhash.Hash is just [32]byte
@@ -53,6 +53,8 @@ var testNet3GenHash = chainhash.Hash{
 	0x01, 0xea, 0x33, 0x09, 0x00, 0x00, 0x00, 0x00,
 }
 
+var REG_TEST_GEN_HASH chainhash.Hash
+
 //Parser parses blocks from the .dat files bitcoin core provides
 func Parser(sig chan bool) error {
 
@@ -63,14 +65,15 @@ func Parser(sig chan bool) error {
 
 	var currentOffsetHeight int
 	tipnum := 0
-	tip := testNet3GenHash
+	// tip := testNet3GenHash
+	tip := REG_TEST_GEN_HASH
 	nextMap := make(map[[32]byte]RawHeaderData)
 
 	//if there isn't an offset file, make one
 	if hasAccess("offsetfile") == false {
 		currentOffsetHeight, _ = buildOffsetFile(tip, tipnum, nextMap, offsetfinished)
-	//if there is a offset file, we should pass true to offsetfinished
-	//to let stopParse() know that it shouldn't delete offsetfile
+		//if there is a offset file, we should pass true to offsetfinished
+		//to let stopParse() know that it shouldn't delete offsetfile
 	} else {
 		offsetfinished <- true
 	}
@@ -129,7 +132,7 @@ func Parser(sig chan bool) error {
 		writeBlock(block, tipnum+1, outfile, batchan, &batchwg)
 		//Just something to let the user know that the program is still running
 		//The actual block the program is on is +1 of the printed number
-		if tipnum % 50000 == 0 {
+		if tipnum%50000 == 0 {
 			fmt.Println("On block :", tipnum)
 		}
 	}
@@ -164,7 +167,7 @@ func getTipNum() (int, error) {
 	var s string
 
 	//Reads backwards and appends the character read to `all` until we hit the character "h".
-	for s != "h" && x > -20 {//probably an empty/corrupted file if we loop more than 20 times
+	for s != "h" && x > -20 { //probably an empty/corrupted file if we loop more than 20 times
 		f.Seek(x, 2)
 		f.Read(buf)
 		s = fmt.Sprintf("%s", buf)
@@ -278,14 +281,15 @@ func readRawHeadersFromFile(fileNum uint32) ([]RawHeaderData, error) {
 		var blockheader [80]byte
 		f.Read(blockheader[:])
 
-		copy(b.Prevhash[:], blockheader[4:32])
+		// copy(b.Prevhash[:], blockheader[4:32])
+		copy(b.Prevhash[:], blockheader[4:4+32])
 
 		//create block hash
 		first := sha256.Sum256(blockheader[:])
 		b.CurrentHeaderHash = sha256.Sum256(first[:])
 
 		//offset for the next block from the current position
-		loc, err = f.Seek(int64(LBtU32(size[:])) - 80, 1)
+		loc, err = f.Seek(int64(LBtU32(size[:]))-80, 1)
 		blockHeaders = append(blockHeaders, *b)
 		b = nil
 	}
@@ -294,15 +298,15 @@ func readRawHeadersFromFile(fileNum uint32) ([]RawHeaderData, error) {
 
 //Sorts and writes the block offset from the passed in blockHeaders.
 func writeBlockOffset(
-	blockHeaders []RawHeaderData,//        All headers from the select .dat file
-	nextMap map[[32]byte]RawHeaderData,//  Map to save the current block hash 
-	offsetFile *os.File,//                 File to save the sorted blocks and locations to
-	tipnum int,//                          Current block it's on
-	tip chainhash.Hash) (//                Current hash of the block it's on
-		chainhash.Hash, int, error) {
+	blockHeaders []RawHeaderData,       //        All headers from the select .dat file
+	nextMap map[[32]byte]RawHeaderData, //  Map to save the current block hash
+	offsetFile *os.File,                //                 File to save the sorted blocks and locations to
+	tipnum int,                         //                          Current block it's on
+	tip chainhash.Hash) ( //                Current hash of the block it's on
+	chainhash.Hash, int, error) {
 
 	for _, b := range blockHeaders {
-		if len(nextMap) > 10000 {//Just a random big number
+		if len(nextMap) > 10000 { //Just a random big number
 			fmt.Println("Dead end tip. Exiting...")
 			break
 		}
@@ -342,7 +346,7 @@ func getRawBlockFromFile(tipnum int, offsetFile *os.File) (wire.MsgBlock, error)
 
 	//offset file consists of 8 bytes per block
 	//tipnum * 8 gives us the correct position for that block
-	offsetFile.Seek(int64(8 * tipnum), 0)
+	offsetFile.Seek(int64(8*tipnum), 0)
 
 	//Read file and offset for the block
 	offsetFile.Read(datFile[:])
@@ -354,7 +358,7 @@ func getRawBlockFromFile(tipnum int, offsetFile *os.File) (wire.MsgBlock, error)
 		panic(err)
 	}
 	//+8 skips the 8 bytes of magicbytes and load size
-	f.Seek(int64(BtU32(offset[:]) + 8), 0)
+	f.Seek(int64(BtU32(offset[:])+8), 0)
 
 	b := new(wire.MsgBlock)
 	err = b.Deserialize(f)
@@ -426,21 +430,22 @@ func isUnspendable(o *wire.TxOut) bool {
 //Converts 4 byte Little Endian slices to uint32.
 //Returns ffffffff if something doesn't work.
 func LBtU32(b []byte) uint32 {
-        if len(b) != 4 {
-                fmt.Printf("Got %x to LBtU32 (%d bytes)\n", b, len(b))
-                return 0xffffffff
-        }
-        var i uint32
-        buf := bytes.NewBuffer(b)
-        binary.Read(buf, binary.LittleEndian, &i)
-        return i
+	if len(b) != 4 {
+		fmt.Printf("Got %x to LBtU32 (%d bytes)\n", b, len(b))
+		return 0xffffffff
+	}
+	var i uint32
+	buf := bytes.NewBuffer(b)
+	binary.Read(buf, binary.LittleEndian, &i)
+	return i
 }
 
 //checkMagicByte checks for the Bitcoin magic bytes.
 //returns false if it didn't read the Bitcoin magic bytes.
 func checkMagicByte(bytesgiven [4]byte) bool {
 	if bytesgiven != [4]byte{0x0b, 0x11, 0x09, 0x07} && //testnet
-		bytesgiven != [4]byte{0xf9, 0xbe, 0xb4, 0xd9} { // mainnet
+		bytesgiven != [4]byte{0xf9, 0xbe, 0xb4, 0xd9} && // mainnet
+		bytesgiven != [4]byte{0xfa, 0xbf, 0xb5, 0xda} { // regtest
 		fmt.Printf("got non magic bytes %x, finishing\n", bytesgiven)
 		return false
 	} else {
@@ -469,7 +474,7 @@ func stopParse(sig chan bool, offsetfinished chan bool) {
 //Reverses the given string.
 //"asdf" becomes "fdsa".
 func reverse(s string) (result string) {
-	for _,v := range s {
+	for _, v := range s {
 		result = string(v) + result
 	}
 	return
