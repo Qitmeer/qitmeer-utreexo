@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"syscall"
 
 	"github.com/mit-dci/lit/btcutil/chaincfg/chainhash"
 	"github.com/mit-dci/lit/wire"
@@ -195,7 +196,8 @@ func buildOffsetFile(tip chainhash.Hash, tipnum int, nextMap map[[32]byte]RawHea
 	}
 
 	defer offsetFile.Close()
-	for fileNum := 0; ; fileNum++ {
+	fileNum := 0
+	for ; ; fileNum++ {
 		fileName := fmt.Sprintf("blk%05d.dat", fileNum)
 		fmt.Printf("Building offsetfile... %s\n", fileName)
 
@@ -213,6 +215,11 @@ func buildOffsetFile(tip chainhash.Hash, tipnum int, nextMap map[[32]byte]RawHea
 			panic(err)
 		}
 	}
+	if fileNum == 0 {
+		fmt.Println("No block file(blk*.dat) found, exit!")
+		syscall.Kill(syscall.Getpid(), syscall.SIGINT)
+	}
+
 	//write the last height of the offsetfile
 	currentOffsetHeightFile, err := os.OpenFile("currentoffsetheight", os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {

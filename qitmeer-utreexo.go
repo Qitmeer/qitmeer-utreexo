@@ -8,8 +8,8 @@ import (
 	"syscall"
 
 	"github.com/Qitmeer/qitmeer-utreexo/cmd/blockparser"
-	"github.com/Qitmeer/qitmeer-utreexo/cmd/txottl"
 	"github.com/Qitmeer/qitmeer-utreexo/cmd/ibdsim"
+	"github.com/Qitmeer/qitmeer-utreexo/cmd/txottl"
 )
 
 var msg = `
