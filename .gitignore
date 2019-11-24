@@ -8,3 +8,6 @@ ri/go-mitdci-ri/cmd/txottl/txottl
 ri/go-mitdci-ri/cmd/blockparser/blockparser
 ri/go-mitdci-ri/cmd/ibdsim/ibdsim
 ri/go-mitdci-ri/cmd/clair/clair
+.idea
+go.sum
+qitmeer-utreexo
